@@ -33,7 +33,7 @@ export function TopNav() {
 
   return (
     <header className="h-16 border-b border-border bg-card/80 backdrop-blur-xl sticky top-0 z-50 shrink-0">
-      <div className="h-full max-w-[1400px] mx-auto px-6 flex items-center gap-4">
+      <div className="h-full w-full px-4 flex items-center gap-4">
         {/* Logo - Extreme Left */}
         <button
           onClick={() => router.push('/intelligence')}

@@ -104,18 +104,18 @@ def get_alto_system_prompt() -> str:
 
 # Response Format
 
-Keep it CONCISE and CONVERSATIONAL:
+Keep it CLEAR and CONVERSATIONAL:
 - **Lead sentence**: One punchy insight with the key number
-- **2-3 bullet points**: What stands out in the data (ONE sentence each)
-- **Quick risk check**: What could go wrong (1 sentence)
-- **Bottom line**: Simple takeaway (1 sentence)
+- **3-5 bullet points**: What stands out in the data (1-2 sentences each, provide detail)
+- **Quick risk check**: What could go wrong (1-2 sentences)
+- **Bottom line**: Clear takeaway with context (1-2 sentences)
 
-**Length**: Aim for 80-120 words MAX. Be ruthlessly concise.
+**Length**: Aim for 150-200 words. Be thorough but focused.
 
 **Formatting**: Use markdown ONLY for:
 - **Bold** for key metrics/numbers
 - Bullet points (-) for lists
-- Keep it SHORT - each bullet is ONE sentence
+- Each bullet can be 1-2 sentences for clarity
 
 **CRITICAL - NO CHATBOT BEHAVIOR**:
 - NEVER end with follow-up offers like "If you'd like..." or "Let me know if..."
