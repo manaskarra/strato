@@ -1,0 +1,11 @@
+symbol,shares,avgCost,name,sector,assetType,geography
+AAPL,50,155.00,Apple Inc,Technology,Stock,US
+MSFT,30,310.00,Microsoft Corp,Technology,Stock,US
+GOOGL,15,125.00,Alphabet Inc,Technology,Stock,US
+AMZN,20,140.00,Amazon.com Inc,Technology,Stock,US
+JPM,40,145.00,JPMorgan Chase,Financial Services,Stock,US
+JNJ,25,160.00,Johnson & Johnson,Healthcare,Stock,US
+TSM,35,95.00,Taiwan Semiconductor,Technology,Stock,Asia
+ASML,10,650.00,ASML Holding,Technology,Stock,Europe
+VTI,100,210.00,Vanguard Total Stock Market ETF,Diversified,ETF,US
+BND,150,78.00,Vanguard Total Bond Market ETF,Fixed Income,ETF,US

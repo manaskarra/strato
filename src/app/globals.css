@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ── Light Mode ── */
+  :root {
+    --background: 40 20% 97%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 220 25% 10%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 220 25% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 221 83% 53%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 0 72% 51%;
+    --chart-3: 240 60% 60%;
+    --chart-4: 330 70% 55%;
+    --chart-5: 200 80% 55%;
+    --radius: 0.625rem;
+    --sidebar-bg: 0 0% 100%;
+    --glass: 0 0% 100%;
+    --glass-border: 220 13% 90%;
+  }
+
+  /* ── Dark Mode ── */
+  .dark {
+    --background: 225 30% 6%;
+    --foreground: 210 40% 96%;
+    --card: 225 25% 9%;
+    --card-foreground: 210 40% 96%;
+    --popover: 225 25% 9%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 225 20% 13%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 225 20% 13%;
+    --muted-foreground: 218 15% 50%;
+    --accent: 225 20% 13%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 225 18% 15%;
+    --input: 225 18% 15%;
+    --ring: 221 83% 53%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 0 72% 51%;
+    --chart-3: 240 60% 60%;
+    --chart-4: 330 70% 55%;
+    --chart-5: 200 80% 55%;
+    --radius: 0.625rem;
+    --sidebar-bg: 225 30% 7%;
+    --glass: 225 25% 9%;
+    --glass-border: 225 18% 15%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .font-display {
+    font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* React Flow custom styles */
+.react-flow__node {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.4) !important;
+}
+.react-flow__edge-path {
+  stroke-width: 2 !important;
+}
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+}
+/* Hide ReactFlow MiniMap branding */
+.react-flow__minimap a {
+  display: none !important;
+}
+
+/* Skeleton pulse animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Glow effects */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 60px rgba(59, 130, 246, 0.1);
+}
+.glow-red {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.1);
+}
+.glow-blue-sm {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+.glow-red-sm {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+/* Glass card utility for themed glass effects */
+.glass-card {
+  background: hsl(var(--glass));
+  border: 1px solid hsl(var(--glass-border));
+}
+
+/* Top nav active indicator */
+.nav-active-indicator {
+  position: relative;
+}
+.nav-active-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: hsl(var(--primary));
+  border-radius: 1px 1px 0 0;
+}
