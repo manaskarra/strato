@@ -46,3 +46,37 @@ __pycache__/
 backend/.env
 *.py[cod]
 *$py.class
+.pytest_cache/
+.mypy_cache/
+.tox/
+dist/
+*.egg-info/
+.coverage
+
+# Data files (CSV, Excel, DB)
+*.csv
+*.xlsx
+*.xls
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment (explicit)
+.env
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+
+# Build artifacts
+.cache/
+frontend/.next/
