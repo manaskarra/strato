@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import {
   GraduationCap, Save, FolderOpen, Trash2, Sparkles,
   BarChart3, TrendingUp, DollarSign, Newspaper, Activity,
-  PieChart, GitCompare, Hash, CandlestickChart, Play,
+  PieChart, GitCompare, Hash, CandlestickChart, Play, Smile,
 } from 'lucide-react';
 
 const nodeCategories = [
@@ -40,6 +40,7 @@ const nodeCategories = [
       { type: 'news-search', label: 'News Search', icon: Newspaper, description: 'Fetch market & company news' },
       { type: 'technical-analysis', label: 'Technical Analysis', icon: Activity, description: 'RSI, MACD, moving averages' },
       { type: 'fundamental-analysis', label: 'Fundamental Analysis', icon: DollarSign, description: 'P/E, revenue, margins' },
+      { type: 'sentiment-analysis', label: 'Sentiment Analysis', icon: Smile, description: 'News & social sentiment' },
       { type: 'live-chart', label: 'Live Chart', icon: TrendingUp, description: 'Real-time price charts' },
       { type: 'alto-analysis', label: 'Ask Alto', icon: Sparkles, description: 'AI-powered analysis' },
     ],
@@ -69,6 +70,16 @@ function LearningLabInner() {
     [setEdges]
   );
 
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      // Delete the node and its connected edges
+      setNodes((nds) => nds.filter((n) => n.id !== node.id));
+      setEdges((eds) => eds.filter((e) => e.source !== node.id && e.target !== node.id));
+    },
+    [setNodes, setEdges]
+  );
+
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
@@ -86,8 +97,9 @@ function LearningLabInner() {
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
       if (!reactFlowBounds) return;
 
+      // Position nodes more to the left (offset by 50px from drop point)
       const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
+        x: event.clientX - reactFlowBounds.left - 50,
         y: event.clientY - reactFlowBounds.top,
       });
 
@@ -155,10 +167,48 @@ function LearningLabInner() {
     setShowRunDialog(false);
 
     try {
-      const result = await executeWorkflow(nodes, edges, {
-        symbol: executionSymbol,
-        exchange: 'US',
-      });
+      const result = await executeWorkflow(
+        nodes,
+        edges,
+        {
+          symbol: executionSymbol,
+          exchange: 'US',
+        },
+        (progressResults) => {
+          // Update node states in real-time
+          setNodes((nds) =>
+            nds.map((node) => {
+              const status = progressResults.get(node.id)?.status || 'idle';
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  status,
+                },
+              };
+            })
+          );
+
+          // Animate edges connected to loading nodes
+          setEdges((eds) =>
+            eds.map((edge) => {
+              const sourceStatus = progressResults.get(edge.source)?.status;
+              const targetStatus = progressResults.get(edge.target)?.status;
+              const isActive = sourceStatus === 'loading' || targetStatus === 'loading';
+
+              return {
+                ...edge,
+                animated: isActive,
+                style: {
+                  ...edge.style,
+                  stroke: isActive ? '#3b82f6' : sourceStatus === 'success' ? '#10b981' : '#3b82f6',
+                  strokeWidth: isActive ? 3 : 2,
+                },
+              };
+            })
+          );
+        }
+      );
 
       setWorkflowResults(result.results);
       setShowResults(true);
@@ -166,30 +216,38 @@ function LearningLabInner() {
       console.error('Workflow execution error:', error);
     } finally {
       setIsExecuting(false);
+      // Reset edge animations
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          animated: false,
+          style: { stroke: '#10b981', strokeWidth: 2 },
+        }))
+      );
     }
   };
 
   return (
-    <div className="flex h-[calc(100vh-0px)]">
+    <div className="flex h-full overflow-hidden">
       {/* Left Sidebar — Node Palette */}
-      <div className="w-[280px] border-r border-border bg-card/50 flex flex-col shrink-0">
-        <div className="p-4 border-b border-border bg-card/80 backdrop-blur">
-          <h2 className="text-base font-bold flex items-center gap-2 text-foreground">
-            <GraduationCap className="w-5 h-5 text-blue-500" />
+      <div className="w-[240px] border-r border-border bg-card/50 flex flex-col shrink-0 overflow-hidden">
+        <div className="p-3 border-b border-border bg-card/80 backdrop-blur">
+          <h2 className="text-sm font-bold flex items-center gap-2 text-foreground">
+            <GraduationCap className="w-4 h-4 text-blue-500" />
             Learning Lab
           </h2>
-          <p className="text-[11px] text-muted-foreground mt-1.5">Drag nodes to the canvas and connect them</p>
+          <p className="text-[10px] text-muted-foreground mt-1">Drag nodes to canvas</p>
         </div>
 
-        <div className="px-3 py-2 bg-muted/30 border-b border-border">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tools</p>
+        <div className="px-3 py-1.5 bg-muted/30 border-b border-border">
+          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Tools</p>
         </div>
 
         <ScrollArea className="flex-1">
-          <div className="p-3 space-y-3">
+          <div className="p-2.5 space-y-2.5">
             {nodeCategories.map((cat) => (
               <div key={cat.label}>
-                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2 px-1" style={{ color: cat.color }}>
+                <p className="text-[9px] font-semibold uppercase tracking-wider mb-1.5 px-1" style={{ color: cat.color }}>
                   {cat.label}
                 </p>
                 <div className="space-y-1.5">
@@ -198,17 +256,17 @@ function LearningLabInner() {
                     return (
                       <div
                         key={node.type}
-                        className="flex items-center gap-2.5 p-2.5 rounded-lg border border-border/50 cursor-grab hover:border-opacity-100 hover:shadow-md hover:scale-[1.02] transition-all bg-card active:cursor-grabbing active:scale-95"
+                        className="flex items-center gap-2 p-2 rounded-md border border-border/50 cursor-grab hover:border-opacity-100 hover:shadow-md hover:scale-[1.02] transition-all bg-card active:cursor-grabbing active:scale-95"
                         draggable
                         onDragStart={(e) => onDragStart(e, node.type, node.label, cat.color)}
                         style={{ borderColor: `${cat.color}30` }}
                       >
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm" style={{ backgroundColor: `${cat.color}20`, color: cat.color }}>
-                          <Icon className="w-4 h-4" />
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${cat.color}20`, color: cat.color }}>
+                          <Icon className="w-3.5 h-3.5" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-foreground truncate">{node.label}</p>
-                          <p className="text-[10px] text-muted-foreground/80 truncate leading-tight mt-0.5">{node.description}</p>
+                          <p className="text-[11px] font-semibold text-foreground truncate">{node.label}</p>
+                          <p className="text-[9px] text-muted-foreground/80 truncate leading-tight mt-0.5">{node.description}</p>
                         </div>
                       </div>
                     );
@@ -219,29 +277,31 @@ function LearningLabInner() {
           </div>
         </ScrollArea>
 
-        <div className="p-3 border-t border-border space-y-2">
+        <div className="p-2.5 border-t border-border space-y-1.5">
           <Button
-            className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700"
+            size="sm"
+            className="w-full gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700"
             onClick={() => setShowRunDialog(true)}
             disabled={nodes.length === 0 || isExecuting}
           >
-            <Play className="w-4 h-4" /> {isExecuting ? 'Running...' : 'Run Workflow'}
+            <Play className="w-3.5 h-3.5" /> {isExecuting ? 'Running...' : 'Run Workflow'}
           </Button>
           <Button
-            className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
+            size="sm"
+            className="w-full gap-1.5 text-xs bg-blue-600 hover:bg-blue-700"
             onClick={handleLearn}
             disabled={nodes.length < 2 || tutorialLoading}
           >
-            <Sparkles className="w-4 h-4" /> {tutorialLoading ? 'Generating...' : 'Learn'}
+            <Sparkles className="w-3.5 h-3.5" /> {tutorialLoading ? 'Generating...' : 'Learn'}
           </Button>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1 gap-1 text-xs" onClick={() => setShowTemplates(true)}>
+          <div className="flex gap-1.5">
+            <Button variant="outline" size="sm" className="flex-1 gap-1 text-[10px] px-2" onClick={() => setShowTemplates(true)}>
               <FolderOpen className="w-3 h-3" /> Templates
             </Button>
-            <Button variant="outline" size="sm" className="flex-1 gap-1 text-xs" onClick={() => setSavedWorkflows([...savedWorkflows, { name: `Workflow ${savedWorkflows.length + 1}`, nodes, edges }])} disabled={nodes.length === 0}>
+            <Button variant="outline" size="sm" className="flex-1 gap-1 text-[10px] px-2" onClick={() => setSavedWorkflows([...savedWorkflows, { name: `Workflow ${savedWorkflows.length + 1}`, nodes, edges }])} disabled={nodes.length === 0}>
               <Save className="w-3 h-3" /> Save
             </Button>
-            <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={() => { setNodes([]); setEdges([]); }}>
+            <Button variant="outline" size="sm" className="gap-1 text-[10px] px-2" onClick={() => { setNodes([]); setEdges([]); }}>
               <Trash2 className="w-3 h-3" />
             </Button>
           </div>
@@ -249,10 +309,11 @@ function LearningLabInner() {
       </div>
 
       {/* Canvas */}
-      <div className="flex-1 relative" ref={reactFlowWrapper}>
+      <div className="flex-1 min-w-0 relative" ref={reactFlowWrapper}>
         <ReactFlow
           nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
           onConnect={onConnect} onInit={setReactFlowInstance} onDrop={onDrop} onDragOver={onDragOver}
+          onNodeContextMenu={onNodeContextMenu}
           nodeTypes={nodeTypes} fitView
           className="bg-background"
         >
@@ -262,14 +323,14 @@ function LearningLabInner() {
 
         {nodes.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center p-8 bg-card/90 backdrop-blur rounded-xl border border-dashed border-border max-w-md pointer-events-auto">
-              <GraduationCap className="w-10 h-10 text-blue-500/50 mx-auto mb-3" />
-              <h3 className="font-semibold text-foreground">Build Your Analysis Workflow</h3>
-              <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+            <div className="text-center p-6 bg-card/90 backdrop-blur rounded-xl border border-dashed border-border max-w-sm pointer-events-auto">
+              <GraduationCap className="w-8 h-8 text-blue-500/50 mx-auto mb-2" />
+              <h3 className="text-sm font-semibold text-foreground">Build Your Analysis Workflow</h3>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                 Drag nodes from the left sidebar onto this canvas. Connect them to build your analysis pipeline, then click <strong className="text-blue-500">Learn</strong> to get a personalized tutorial.
               </p>
-              <Button variant="outline" className="mt-4 gap-2" onClick={() => setShowTemplates(true)}>
-                <FolderOpen className="w-4 h-4" /> Start with a Template
+              <Button variant="outline" size="sm" className="mt-3 gap-2 text-xs" onClick={() => setShowTemplates(true)}>
+                <FolderOpen className="w-3.5 h-3.5" /> Start with a Template
               </Button>
             </div>
           </div>
