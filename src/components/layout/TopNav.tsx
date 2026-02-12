@@ -3,17 +3,18 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { ExpandableTabs } from '@/components/ui/expandable-tabs';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { CloudSun, LayoutDashboard, PieChart, GraduationCap, TrendingUp } from 'lucide-react';
+import { CloudSun, LayoutDashboard, MessageSquare, PieChart, GraduationCap, TrendingUp } from 'lucide-react';
 
 const navTabs = [
   { title: 'Intelligence', icon: LayoutDashboard },
+  { title: 'Ask Alto', icon: MessageSquare },
   { title: 'Portfolio', icon: PieChart },
   { type: 'separator' as const },
   { title: 'Learning Lab', icon: GraduationCap },
   { title: 'Polymarket', icon: TrendingUp },
 ];
 
-const routes = ['/intelligence', '/portfolio', null, '/learning', '/polymarket'];
+const routes = ['/intelligence', '/alto', '/portfolio', null, '/learning', '/polymarket'];
 
 function pathnameToTabIndex(pathname: string): number {
   const idx = routes.indexOf(pathname);
@@ -32,8 +33,8 @@ export function TopNav() {
 
   return (
     <header className="h-16 border-b border-border bg-card/80 backdrop-blur-xl sticky top-0 z-50 shrink-0">
-      <div className="h-full max-w-[1400px] mx-auto px-6 flex items-center justify-between gap-4">
-        {/* Logo */}
+      <div className="h-full max-w-[1400px] mx-auto px-6 flex items-center gap-4">
+        {/* Logo - Extreme Left */}
         <button
           onClick={() => router.push('/intelligence')}
           className="flex items-center gap-2.5 group shrink-0"
@@ -46,15 +47,17 @@ export function TopNav() {
           </span>
         </button>
 
-        {/* Expandable Tabs Nav */}
-        <ExpandableTabs
-          tabs={navTabs}
-          activeColor="text-primary"
-          activeTab={pathnameToTabIndex(pathname)}
-          onChange={handleTabChange}
-        />
+        {/* Expandable Tabs Nav - Centered */}
+        <div className="flex-1 flex justify-center">
+          <ExpandableTabs
+            tabs={navTabs}
+            activeColor="text-primary"
+            activeTab={pathnameToTabIndex(pathname)}
+            onChange={handleTabChange}
+          />
+        </div>
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle - Extreme Right */}
         <div className="shrink-0">
           <ThemeToggle />
         </div>

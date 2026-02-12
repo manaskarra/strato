@@ -72,3 +72,18 @@ async def get_chart_data(
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/sentiment")
+async def get_sentiment(
+    symbol: str = Query(..., description="Stock symbol"),
+    exchange: str = Query("US", description="Exchange code"),
+):
+    """
+    Fetch sentiment analysis data
+    """
+    try:
+        data = await eodhd_service.fetch_sentiment(symbol, exchange)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

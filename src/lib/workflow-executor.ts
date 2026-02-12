@@ -19,7 +19,8 @@ export interface WorkflowExecutionResult {
 export async function executeWorkflow(
   nodes: Node[],
   edges: Edge[],
-  inputData: { symbol?: string; symbols?: string[]; exchange?: string }
+  inputData: { symbol?: string; symbols?: string[]; exchange?: string },
+  onProgress?: (results: Map<string, NodeResult>) => void
 ): Promise<WorkflowExecutionResult> {
   const results = new Map<string, NodeResult>();
 
@@ -51,6 +52,9 @@ export async function executeWorkflow(
         status: 'loading',
       });
 
+      // Notify progress
+      onProgress?.(new Map(results));
+
       const result = await executeNode(node, inputs, inputData);
 
       results.set(nodeId, {
@@ -59,6 +63,9 @@ export async function executeWorkflow(
         status: 'success',
         data: result,
       });
+
+      // Notify progress
+      onProgress?.(new Map(results));
     } catch (error: any) {
       results.set(nodeId, {
         nodeId,
@@ -66,6 +73,9 @@ export async function executeWorkflow(
         status: 'error',
         error: error.message || 'Unknown error',
       });
+
+      // Notify progress
+      onProgress?.(new Map(results));
     }
   }
 
@@ -110,6 +120,10 @@ async function executeNode(
     case 'live-chart':
       const { apiClient: chartClient } = await import('@/lib/api-client');
       return await chartClient.fetchChartData(symbol, exchange, 'month');
+
+    case 'sentiment-analysis':
+      const { apiClient: sentimentClient } = await import('@/lib/api-client');
+      return await sentimentClient.fetchSentiment(symbol, exchange);
 
     case 'alto-analysis':
       const { apiClient: altoClient } = await import('@/lib/api-client');

@@ -18,11 +18,15 @@ interface WorkflowResultsProps {
 
 export function WorkflowResults({ results, onClose }: WorkflowResultsProps) {
   const resultsArray = Array.from(results.values());
-  const successfulResults = resultsArray.filter((r) => r.status === 'success');
+  // Filter out input nodes - only show analysis results
+  const analysisResults = resultsArray.filter(
+    (r) => !['symbol-input', 'stock-selection'].includes(r.nodeType)
+  );
+  const successfulResults = analysisResults.filter((r) => r.status === 'success');
 
   return (
-    <div className="w-[400px] border-l border-border bg-card flex flex-col shrink-0">
-      <div className="flex items-center justify-between p-4 border-b border-border">
+    <div className="w-[320px] border-l border-border bg-card flex flex-col shrink-0 h-full overflow-hidden">
+      <div className="flex items-center justify-between p-3 border-b border-border">
         <div className="flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-blue-500" />
           <h3 className="text-sm font-bold text-foreground">Workflow Results</h3>
@@ -38,25 +42,25 @@ export function WorkflowResults({ results, onClose }: WorkflowResultsProps) {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {resultsArray.map((result) => (
-            <Card key={result.nodeId}>
+        <div className="p-3 space-y-3">
+          {analysisResults.map((result) => (
+            <Card key={result.nodeId} className="overflow-hidden">
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-semibold">
+                <div className="flex items-center justify-between gap-2 min-w-0">
+                  <CardTitle className="text-sm font-semibold truncate">
                     {formatNodeType(result.nodeType)}
                   </CardTitle>
                   <StatusBadge status={result.status} />
                 </div>
               </CardHeader>
               {result.status === 'success' && result.data && (
-                <CardContent className="pt-0">
+                <CardContent className="pt-0 overflow-hidden">
                   <ResultContent nodeType={result.nodeType} data={result.data} />
                 </CardContent>
               )}
               {result.status === 'error' && (
-                <CardContent className="pt-0">
-                  <p className="text-xs text-red-500">{result.error}</p>
+                <CardContent className="pt-0 overflow-hidden">
+                  <p className="text-xs text-red-500 break-words">{result.error}</p>
                 </CardContent>
               )}
             </Card>
@@ -93,6 +97,8 @@ function ResultContent({ nodeType, data }: { nodeType: string; data: any }) {
       return <TechnicalResults data={data} />;
     case 'fundamental-analysis':
       return <FundamentalResults data={data} />;
+    case 'sentiment-analysis':
+      return <SentimentResults data={data} />;
     case 'live-chart':
       return <ChartResults data={data} />;
     case 'alto-analysis':
@@ -110,8 +116,8 @@ function NewsResults({ data }: { data: any[] }) {
   return (
     <div className="space-y-2">
       {data.slice(0, 3).map((article, idx) => (
-        <div key={idx} className="border-l-2 border-blue-500 pl-2">
-          <p className="text-xs font-medium text-foreground line-clamp-2">{article.title}</p>
+        <div key={idx} className="border-l-2 border-blue-500 pl-2 min-w-0">
+          <p className="text-xs font-medium text-foreground line-clamp-2 break-words">{article.title}</p>
           <p className="text-[10px] text-muted-foreground mt-0.5">
             {new Date(article.date).toLocaleDateString()}
           </p>
@@ -126,11 +132,11 @@ function NewsResults({ data }: { data: any[] }) {
 
 function MetricRow({ label, value, tooltip }: { label: string; value: string | number; tooltip: string }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-2 min-w-0">
       <TooltipProvider delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="text-xs text-muted-foreground flex items-center gap-1 cursor-help">
+            <span className="text-xs text-muted-foreground flex items-center gap-1 cursor-help shrink-0">
               {label}
               <HelpCircle className="w-3 h-3 opacity-50" />
             </span>
@@ -140,7 +146,7 @@ function MetricRow({ label, value, tooltip }: { label: string; value: string | n
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <span className="text-xs font-semibold">{value}</span>
+      <span className="text-xs font-semibold shrink-0">{value}</span>
     </div>
   );
 }
@@ -206,6 +212,51 @@ function FundamentalResults({ data }: { data: any }) {
   );
 }
 
+function SentimentResults({ data }: { data: any }) {
+  if (!data || !data.latest) {
+    return <p className="text-xs text-muted-foreground">No sentiment data</p>;
+  }
+
+  const getSentimentColor = (score: number) => {
+    if (score > 0.3) return 'text-emerald-500';
+    if (score < -0.3) return 'text-red-500';
+    return 'text-yellow-500';
+  };
+
+  const getSentimentLabel = (score: number) => {
+    if (score > 0.5) return 'Very Positive';
+    if (score > 0.2) return 'Positive';
+    if (score > -0.2) return 'Neutral';
+    if (score > -0.5) return 'Negative';
+    return 'Very Negative';
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">Latest Sentiment:</span>
+        <span className={`text-xs font-semibold shrink-0 ${getSentimentColor(data.latest.normalized)}`}>
+          {getSentimentLabel(data.latest.normalized)} ({data.latest.normalized.toFixed(2)})
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">30-Day Average:</span>
+        <span className={`text-xs font-semibold shrink-0 ${getSentimentColor(data.average)}`}>
+          {data.average.toFixed(2)}
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">Articles Analyzed:</span>
+        <span className="text-xs font-semibold shrink-0">{data.totalArticles}</span>
+      </div>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">Latest Date:</span>
+        <span className="text-xs font-semibold shrink-0">{data.latest.date}</span>
+      </div>
+    </div>
+  );
+}
+
 function ChartResults({ data }: { data: any[] }) {
   if (!Array.isArray(data) || data.length === 0) {
     return <p className="text-xs text-muted-foreground">No chart data</p>;
@@ -218,20 +269,20 @@ function ChartResults({ data }: { data: any[] }) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Latest Price:</span>
-        <span className="text-xs font-semibold">${latest?.close?.toFixed(2)}</span>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">Latest Price:</span>
+        <span className="text-xs font-semibold shrink-0">${latest?.close?.toFixed(2)}</span>
       </div>
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Change:</span>
-        <span className={`text-xs font-semibold flex items-center gap-1 ${change >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">Change:</span>
+        <span className={`text-xs font-semibold flex items-center gap-1 shrink-0 ${change >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
           {change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           {changePercent.toFixed(2)}%
         </span>
       </div>
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Data Points:</span>
-        <span className="text-xs font-semibold">{data.length}</span>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">Data Points:</span>
+        <span className="text-xs font-semibold shrink-0">{data.length}</span>
       </div>
     </div>
   );

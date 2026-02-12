@@ -145,5 +145,41 @@ class EODHDService:
                 for item in data
             ]
 
+    async def fetch_sentiment(self, symbol: str, exchange: str = "US"):
+        """Fetch sentiment data"""
+        ticker = f"{symbol}.{exchange}"
+        today = datetime.now().strftime("%Y-%m-%d")
+        thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+
+        url = f"{self.base_url}/sentiments?s={ticker}&from={thirty_days_ago}&to={today}&api_token={self.api_key}&fmt=json"
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+            data = response.json()
+
+            # Extract sentiment data for the ticker
+            sentiment_data = data.get(ticker, [])
+
+            # Calculate average sentiment and get latest
+            if sentiment_data:
+                latest = sentiment_data[0] if sentiment_data else None
+                avg_sentiment = sum(item.get("normalized", 0) for item in sentiment_data) / len(sentiment_data)
+                total_articles = sum(item.get("count", 0) for item in sentiment_data)
+
+                return {
+                    "latest": latest,
+                    "average": avg_sentiment,
+                    "totalArticles": total_articles,
+                    "history": sentiment_data[:7],  # Last 7 days
+                }
+            else:
+                return {
+                    "latest": None,
+                    "average": 0,
+                    "totalArticles": 0,
+                    "history": [],
+                }
+
 
 import asyncio  # Add this import at the top
