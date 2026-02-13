@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeWithAlto } from '@/alto/client';
+import { apiClient } from '@/lib/api-client';
 
 // Rate limiting
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     const { symbol, exchange, inputs, userContext } = body;
 
-    const result = await analyzeWithAlto({
+    const result = await apiClient.analyzeWithAlto({
       symbol,
       exchange: exchange || 'US',
       inputs,

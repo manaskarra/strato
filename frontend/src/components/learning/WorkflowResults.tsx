@@ -155,30 +155,104 @@ function TechnicalResults({ data }: { data: any }) {
   const latestRSI = data.rsi?.[0]?.rsi;
   const latestMACD = data.macd?.[0];
   const latestSMA = data.sma?.[0]?.sma;
+  const latestBBands = data.bbands?.[0];
+  const latestEMA20 = data.ema20?.[0]?.ema;
+  const latestEMA50 = data.ema50?.[0]?.ema;
+  const latestEMA200 = data.ema200?.[0]?.ema;
+  const latestATR = data.atr?.[0]?.atr;
+  const latestStoch = data.stoch?.[0];
 
   return (
-    <div className="space-y-2">
-      {latestRSI && (
-        <MetricRow
-          label="RSI (14):"
-          value={latestRSI.toFixed(2)}
-          tooltip="Relative Strength Index measures momentum. Above 70 = overbought, below 30 = oversold."
-        />
-      )}
-      {latestMACD && (
-        <MetricRow
-          label="MACD:"
-          value={latestMACD.macd?.toFixed(2) || 'N/A'}
-          tooltip="Moving Average Convergence Divergence shows trend direction and momentum. Positive = bullish, negative = bearish."
-        />
-      )}
-      {latestSMA && (
-        <MetricRow
-          label="SMA (50):"
-          value={`$${latestSMA.toFixed(2)}`}
-          tooltip="Simple Moving Average over 50 days. Price above SMA = uptrend, below = downtrend."
-        />
-      )}
+    <div className="space-y-3">
+      {/* Momentum Indicators */}
+      <div className="space-y-2">
+        <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Momentum</p>
+        {latestRSI && (
+          <MetricRow
+            label="RSI (14):"
+            value={latestRSI.toFixed(2)}
+            tooltip="Relative Strength Index measures momentum. Above 70 = overbought, below 30 = oversold."
+          />
+        )}
+        {latestMACD && (
+          <MetricRow
+            label="MACD:"
+            value={latestMACD.macd?.toFixed(2) || 'N/A'}
+            tooltip="Moving Average Convergence Divergence shows trend direction and momentum. Positive = bullish, negative = bearish."
+          />
+        )}
+        {latestStoch && (
+          <MetricRow
+            label="Stochastic:"
+            value={latestStoch.SlowK?.toFixed(2) || 'N/A'}
+            tooltip="Stochastic Oscillator compares closing price to price range. Above 80 = overbought, below 20 = oversold."
+          />
+        )}
+      </div>
+
+      {/* Trend Indicators */}
+      <div className="space-y-2">
+        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Trend</p>
+        {latestSMA && (
+          <MetricRow
+            label="SMA (50):"
+            value={`$${latestSMA.toFixed(2)}`}
+            tooltip="Simple Moving Average over 50 days. Price above SMA = uptrend, below = downtrend."
+          />
+        )}
+        {latestEMA20 && (
+          <MetricRow
+            label="EMA (20):"
+            value={`$${latestEMA20.toFixed(2)}`}
+            tooltip="Exponential Moving Average over 20 days. More responsive to recent prices than SMA."
+          />
+        )}
+        {latestEMA50 && (
+          <MetricRow
+            label="EMA (50):"
+            value={`$${latestEMA50.toFixed(2)}`}
+            tooltip="Exponential Moving Average over 50 days. Key intermediate trend indicator."
+          />
+        )}
+        {latestEMA200 && (
+          <MetricRow
+            label="EMA (200):"
+            value={`$${latestEMA200.toFixed(2)}`}
+            tooltip="Exponential Moving Average over 200 days. Major long-term trend indicator."
+          />
+        )}
+      </div>
+
+      {/* Volatility Indicators */}
+      <div className="space-y-2">
+        <p className="text-[10px] font-bold text-purple-500 uppercase tracking-wider">Volatility</p>
+        {latestBBands && (
+          <>
+            <MetricRow
+              label="BB Upper:"
+              value={`$${latestBBands.upper_band?.toFixed(2) || 'N/A'}`}
+              tooltip="Bollinger Band Upper: Price touching upper band suggests overbought conditions."
+            />
+            <MetricRow
+              label="BB Middle:"
+              value={`$${latestBBands.middle_band?.toFixed(2) || 'N/A'}`}
+              tooltip="Bollinger Band Middle: 20-period SMA, the baseline for the bands."
+            />
+            <MetricRow
+              label="BB Lower:"
+              value={`$${latestBBands.lower_band?.toFixed(2) || 'N/A'}`}
+              tooltip="Bollinger Band Lower: Price touching lower band suggests oversold conditions."
+            />
+          </>
+        )}
+        {latestATR && (
+          <MetricRow
+            label="ATR (14):"
+            value={latestATR.toFixed(2)}
+            tooltip="Average True Range measures volatility. Higher ATR = more volatile price movement."
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -293,30 +367,50 @@ function AltoResults({ data }: { data: any }) {
     return <p className="text-xs text-muted-foreground">No analysis available</p>;
   }
 
-  // Simple markdown-to-HTML conversion
-  const formatAnalysis = (text: string) => {
-    return text
-      // Bold text
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      // Bullet points
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      // Paragraphs
-      .split('\n\n')
-      .map(para => {
-        if (para.includes('<li>')) {
-          return `<ul class="list-disc pl-4 space-y-1">${para}</ul>`;
-        }
-        return `<p>${para}</p>`;
-      })
-      .join('');
+  // Parse markdown safely without dangerouslySetInnerHTML
+  const renderAnalysis = (text: string) => {
+    // Split into paragraphs
+    const paragraphs = text.split('\n\n');
+
+    return paragraphs.map((para, pIdx) => {
+      // Check if it's a bullet list
+      const lines = para.split('\n');
+      if (lines[0]?.trim().startsWith('-')) {
+        return (
+          <ul key={pIdx} className="list-disc pl-4 space-y-1 text-xs mb-2">
+            {lines.map((line, lIdx) => {
+              const content = line.replace(/^-\s*/, '');
+              return <li key={lIdx}>{renderText(content)}</li>;
+            })}
+          </ul>
+        );
+      }
+
+      // Regular paragraph
+      return (
+        <p key={pIdx} className="text-xs mb-2">
+          {renderText(para)}
+        </p>
+      );
+    });
+  };
+
+  // Render text with bold formatting (safe)
+  const renderText = (text: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, idx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={idx} className="font-semibold">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
   };
 
   return (
     <div className="space-y-3">
-      <div
-        className="text-xs text-foreground leading-relaxed space-y-2 [&>p]:mb-2 [&>ul]:mb-2 [&>strong]:font-semibold [&>strong]:text-foreground"
-        dangerouslySetInnerHTML={{ __html: formatAnalysis(data.analysis) }}
-      />
+      <div className="text-foreground leading-relaxed space-y-2">
+        {renderAnalysis(data.analysis)}
+      </div>
       {data.tokensUsed && (
         <div className="pt-2 border-t border-border">
           <p className="text-[10px] text-muted-foreground">

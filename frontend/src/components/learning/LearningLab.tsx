@@ -30,7 +30,7 @@ const nodeCategories = [
     label: 'Analysis', color: '#ec4899',
     nodes: [
       { type: 'news-search', label: 'News Search', icon: Newspaper, description: 'Fetch market & company news' },
-      { type: 'technical-analysis', label: 'Technical Analysis', icon: Activity, description: 'RSI, MACD, moving averages' },
+      { type: 'technical-analysis', label: 'Technical Analysis', icon: Activity, description: 'RSI, MACD, EMA, Bollinger, ATR' },
       { type: 'fundamental-analysis', label: 'Fundamental Analysis', icon: DollarSign, description: 'P/E, revenue, margins' },
       { type: 'sentiment-analysis', label: 'Sentiment Analysis', icon: Smile, description: 'News & social sentiment' },
       { type: 'live-chart', label: 'Live Chart', icon: TrendingUp, description: 'Real-time price charts' },

@@ -33,6 +33,7 @@
     --sidebar-bg: 0 0% 100%;
     --glass: 0 0% 100%;
     --glass-border: 220 13% 90%;
+    --bg-dark: #000000;
   }
 
   /* ── Dark Mode ── */
@@ -65,6 +66,10 @@
     --sidebar-bg: 225 30% 7%;
     --glass: 225 25% 9%;
     --glass-border: 225 18% 15%;
+  }
+  .theme {
+    --color-background: var(--bg-dark);
+    --color-foreground: #ffffff;
   }
 }
 

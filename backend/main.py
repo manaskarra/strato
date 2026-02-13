@@ -4,7 +4,7 @@ Strato Backend API - FastAPI Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
-from routers import eodhd, alto
+from routers import eodhd, alto, macro_edge, polymarket
 
 app = FastAPI(
     title="Strato Backend API",
@@ -24,6 +24,8 @@ app.add_middleware(
 # Include routers
 app.include_router(eodhd.router, prefix="/api/eodhd", tags=["EODHD"])
 app.include_router(alto.router, prefix="/api/alto", tags=["Alto"])
+app.include_router(macro_edge.router, prefix="/api/macro-edge", tags=["Macro Edge"])
+app.include_router(polymarket.router, prefix="/api/polymarket", tags=["Polymarket"])
 
 
 @app.get("/")

@@ -22,11 +22,11 @@ export function middleware(request: NextRequest) {
   // Content Security Policy
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Next.js requires unsafe-eval in dev
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net", // Next.js requires unsafe-eval in dev, allow jsdelivr for components
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data:",
-    "connect-src 'self' https://litellmprod.deriv.ai https://eodhd.com",
+    "connect-src 'self' http://localhost:9320 https://litellmprod.deriv.ai https://eodhd.com https://storage.googleapis.com https://gamma-api.polymarket.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

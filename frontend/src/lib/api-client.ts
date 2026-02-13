@@ -68,6 +68,42 @@ export const apiClient = {
   },
 
   /**
+   * Fetch macro edge scores
+   */
+  async fetchMacroEdgeScores() {
+    const response = await fetch(`${PYTHON_BACKEND_URL}/api/macro-edge/scores`);
+    if (!response.ok) throw new Error('Failed to fetch macro edge scores');
+    return response.json();
+  },
+
+  /**
+   * Fetch all Polymarket finance categories
+   */
+  async fetchPolymarketFinance() {
+    const response = await fetch(`${PYTHON_BACKEND_URL}/api/polymarket/finance`);
+    if (!response.ok) throw new Error('Failed to fetch Polymarket finance data');
+    return response.json();
+  },
+
+  /**
+   * Fetch a single Polymarket finance category
+   */
+  async fetchPolymarketCategory(category: string) {
+    const response = await fetch(`${PYTHON_BACKEND_URL}/api/polymarket/finance/${category}`);
+    if (!response.ok) throw new Error(`Failed to fetch Polymarket ${category} data`);
+    return response.json();
+  },
+
+  /**
+   * Fetch earnings markets with Alto's predictions and edge analysis
+   */
+  async fetchEarningsWithEdge() {
+    const response = await fetch(`${PYTHON_BACKEND_URL}/api/polymarket/earnings-with-edge`);
+    if (!response.ok) throw new Error('Failed to fetch earnings with edge analysis');
+    return response.json();
+  },
+
+  /**
    * Alto AI analysis
    */
   async analyzeWithAlto(data: {

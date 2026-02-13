@@ -119,7 +119,8 @@ async function executeNode(
 
     case 'live-chart':
       const { apiClient: chartClient } = await import('@/lib/api-client');
-      return await chartClient.fetchChartData(symbol, exchange, 'month');
+      const chartData = await chartClient.fetchChartData(symbol, exchange, 'month');
+      return { data: chartData, symbol, exchange };
 
     case 'sentiment-analysis':
       const { apiClient: sentimentClient } = await import('@/lib/api-client');

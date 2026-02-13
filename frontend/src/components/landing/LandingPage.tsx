@@ -20,7 +20,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
     <div className="relative w-full h-screen bg-black overflow-hidden">
       {/* Energy Beam Background */}
       <div className="absolute inset-0 z-0">
-        <EnergyBeam className="!h-screen" />
+        <EnergyBeam />
       </div>
 
       {/* Dark overlay for readability */}

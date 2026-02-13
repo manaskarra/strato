@@ -1,6 +1,7 @@
 """
 EODHD Service - Handles communication with EODHD API
 """
+import asyncio
 import httpx
 from datetime import datetime, timedelta
 from config import settings
@@ -12,28 +13,59 @@ class EODHDService:
         self.api_key = settings.eodhd_api_key
 
     async def fetch_technical_analysis(self, symbol: str, exchange: str = "US"):
-        """Fetch technical indicators (RSI, MACD, SMA)"""
+        """Fetch technical indicators (RSI, MACD, SMA, Bollinger Bands, EMA, ATR, Stochastic)"""
         ticker = f"{symbol}.{exchange}"
         today = datetime.now().strftime("%Y-%m-%d")
         six_months_ago = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
 
         async with httpx.AsyncClient(timeout=30.0) as client:
-            # Fetch RSI, MACD, SMA in parallel
+            # Fetch all technical indicators in parallel
             rsi_url = f"{self.base_url}/technical/{ticker}?function=rsi&period=14&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
             macd_url = f"{self.base_url}/technical/{ticker}?function=macd&fast_period=12&slow_period=26&signal_period=9&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
             sma_url = f"{self.base_url}/technical/{ticker}?function=sma&period=50&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
+
+            # New indicators
+            bbands_url = f"{self.base_url}/technical/{ticker}?function=bbands&period=20&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
+            ema20_url = f"{self.base_url}/technical/{ticker}?function=ema&period=20&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
+            ema50_url = f"{self.base_url}/technical/{ticker}?function=ema&period=50&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
+            ema200_url = f"{self.base_url}/technical/{ticker}?function=ema&period=200&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
+            atr_url = f"{self.base_url}/technical/{ticker}?function=atr&period=14&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
+            stoch_url = f"{self.base_url}/technical/{ticker}?function=stoch&period=14&from={six_months_ago}&to={today}&order=d&api_token={self.api_key}&fmt=json"
 
             responses = await asyncio.gather(
                 client.get(rsi_url),
                 client.get(macd_url),
                 client.get(sma_url),
+                client.get(bbands_url),
+                client.get(ema20_url),
+                client.get(ema50_url),
+                client.get(ema200_url),
+                client.get(atr_url),
+                client.get(stoch_url),
                 return_exceptions=True,
             )
 
+            def safe_json(response):
+                """Safely parse JSON response, return empty list on error"""
+                try:
+                    if isinstance(response, Exception):
+                        return []
+                    if response.status_code >= 400:
+                        return []
+                    return response.json()
+                except Exception:
+                    return []
+
             return {
-                "rsi": responses[0].json() if not isinstance(responses[0], Exception) else [],
-                "macd": responses[1].json() if not isinstance(responses[1], Exception) else [],
-                "sma": responses[2].json() if not isinstance(responses[2], Exception) else [],
+                "rsi": safe_json(responses[0]),
+                "macd": safe_json(responses[1]),
+                "sma": safe_json(responses[2]),
+                "bbands": safe_json(responses[3]),
+                "ema20": safe_json(responses[4]),
+                "ema50": safe_json(responses[5]),
+                "ema200": safe_json(responses[6]),
+                "atr": safe_json(responses[7]),
+                "stoch": safe_json(responses[8]),
             }
 
     async def fetch_fundamental_analysis(self, symbol: str, exchange: str = "US"):
@@ -107,9 +139,12 @@ class EODHDService:
         """Fetch intraday chart data"""
         ticker = f"{symbol}.{exchange}"
         now = int(datetime.now().timestamp())
-        one_day_ago = now - (24 * 60 * 60)
+        # Fetch more data based on interval for better chart visibility
+        days_map = {"5m": 5, "15m": 7, "1h": 10}
+        days_back = days_map.get(interval, 5)
+        from_time = now - (days_back * 24 * 60 * 60)
 
-        url = f"{self.base_url}/intraday/{ticker}?interval={interval}&from={one_day_ago}&to={now}&api_token={self.api_key}&fmt=json"
+        url = f"{self.base_url}/intraday/{ticker}?interval={interval}&from={from_time}&to={now}&api_token={self.api_key}&fmt=json"
 
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(url)
@@ -180,6 +215,3 @@ class EODHDService:
                     "totalArticles": 0,
                     "history": [],
                 }
-
-
-import asyncio  # Add this import at the top

@@ -14,7 +14,7 @@ async def get_technical_analysis(
     exchange: str = Query("US", description="Exchange code"),
 ):
     """
-    Fetch technical analysis indicators (RSI, MACD, SMA)
+    Fetch technical analysis indicators (RSI, MACD, SMA, Bollinger Bands, EMA, ATR, Stochastic)
     """
     try:
         data = await eodhd_service.fetch_technical_analysis(symbol, exchange)

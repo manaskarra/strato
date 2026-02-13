@@ -4,6 +4,12 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { NodeResult } from '@/lib/workflow-executor';
 import { X, Sparkles } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const LiveChart = dynamic<any>(() => import('./LiveChart'), {
+  ssr: false,
+  loading: () => <div className="text-sm text-muted-foreground">Loading chart...</div>
+});
 
 interface ResultModalProps {
   results: NodeResult[];
@@ -18,9 +24,10 @@ export function ResultModal({ results, onClose }: ResultModalProps) {
       .join(' ');
   };
 
-  // Separate Alto from other results
+  // Separate Alto and Live Chart from other results
   const altoResult = results.find(r => r.nodeType === 'alto-analysis');
-  const otherResults = results.filter(r => r.nodeType !== 'alto-analysis');
+  const liveChartResult = results.find(r => r.nodeType === 'live-chart');
+  const otherResults = results.filter(r => r.nodeType !== 'alto-analysis' && r.nodeType !== 'live-chart');
 
   return (
     <motion.div
@@ -76,58 +83,89 @@ export function ResultModal({ results, onClose }: ResultModalProps) {
           ))}
         </div>
 
-        {/* Alto MEGA reveal - Always last (EXTRA DRAMATIC) */}
-        {altoResult && (
-          <motion.div
-            initial={{ scale: 0.3, opacity: 0, rotate: -20, y: 50 }}
-            animate={{
-              scale: 1,
-              opacity: 1,
-              rotate: 0,
-              y: 0,
-              transition: {
-                delay: otherResults.length * 0.8 + 1.2,
-                type: "spring",
-                damping: 12,
-                stiffness: 150,
-                duration: 1.5,
-              }
-            }}
-            className="relative"
-          >
-            {/* Glow effect */}
-            <motion.div
-              animate={{
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1, 1.02, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="absolute inset-0 bg-blue-500/20 rounded-xl blur-xl"
-            />
-
-            <div className="relative bg-card border-2 border-blue-500 rounded-xl p-4 shadow-2xl shadow-blue-500/30 max-h-[400px] overflow-y-auto">
-              <div className="flex items-center gap-3 mb-3 sticky top-0 bg-card z-10 pb-2">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                >
-                  <Sparkles className="w-6 h-6 text-blue-500" />
-                </motion.div>
-                <div>
-                  <h2 className="text-xl font-bold text-foreground">
-                    {formatNodeType(altoResult.nodeType)}
-                  </h2>
-                  <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded mt-1" />
+        {/* Live Chart and Alto Analysis - Side by Side */}
+        {(liveChartResult || altoResult) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            {/* Live Chart - Half Width */}
+            {liveChartResult && (
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0, x: -20 }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                  x: 0,
+                  transition: {
+                    delay: otherResults.length * 0.8,
+                    type: "spring",
+                    damping: 15,
+                    stiffness: 200,
+                  }
+                }}
+                className="bg-card border border-border rounded-lg p-4 shadow-lg"
+              >
+                <div className="mb-3">
+                  <h3 className="text-sm font-bold text-foreground">
+                    {formatNodeType(liveChartResult.nodeType)}
+                  </h3>
+                  <div className="h-0.5 w-8 bg-blue-500 rounded mt-1" />
                 </div>
-              </div>
-              <ResultContent nodeType={altoResult.nodeType} data={altoResult.data} isAlto={true} />
-            </div>
-          </motion.div>
+                <ResultContent nodeType={liveChartResult.nodeType} data={liveChartResult.data} isAlto={false} />
+              </motion.div>
+            )}
+
+            {/* Alto Analysis - Half Width */}
+            {altoResult && (
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0, x: 20 }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                  x: 0,
+                  transition: {
+                    delay: otherResults.length * 0.8 + 0.3,
+                    type: "spring",
+                    damping: 15,
+                    stiffness: 200,
+                  }
+                }}
+                className="relative"
+              >
+                {/* Glow effect */}
+                <motion.div
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                    scale: [1, 1.02, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 bg-blue-500/20 rounded-xl blur-xl"
+                />
+
+                <div className="relative bg-card border-2 border-blue-500 rounded-xl p-4 shadow-2xl shadow-blue-500/30 max-h-[600px] overflow-y-auto">
+                  <div className="flex items-center gap-3 mb-3 sticky top-0 bg-card z-10 pb-2 border-b border-border">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Sparkles className="w-6 h-6 text-blue-500" />
+                    </motion.div>
+                    <div>
+                      <h2 className="text-xl font-bold text-foreground">
+                        {formatNodeType(altoResult.nodeType)}
+                      </h2>
+                      <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded mt-1" />
+                    </div>
+                  </div>
+                  <ResultContent nodeType={altoResult.nodeType} data={altoResult.data} isAlto={true} />
+                </div>
+              </motion.div>
+            )}
+          </div>
         )}
+
       </div>
     </motion.div>
   );
@@ -144,6 +182,8 @@ function ResultContent({ nodeType, data, isAlto }: { nodeType: string; data: any
       return <FundamentalContent data={data} />;
     case 'sentiment-analysis':
       return <SentimentContent data={data} />;
+    case 'live-chart':
+      return <LiveChartContent data={data} />;
     case 'alto-analysis':
       return <AltoContent data={data} />;
     default:
@@ -280,18 +320,51 @@ function AltoContent({ data }: { data: any }) {
     return <p className="text-xs text-muted-foreground">No analysis available</p>;
   }
 
-  const formatAnalysis = (text: string) => {
-    return text
-      .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-blue-400">$1</strong>')
-      .replace(/^- (.+)$/gm, '<li class="mb-1">$1</li>')
-      .split('\n\n')
-      .map(para => {
-        if (para.includes('<li>')) {
-          return `<ul class="list-disc pl-4 space-y-1 text-sm">${para}</ul>`;
-        }
-        return `<p class="text-sm leading-relaxed mb-2">${para}</p>`;
-      })
-      .join('');
+  // Parse markdown safely without dangerouslySetInnerHTML
+  const renderAnalysis = (text: string) => {
+    const paragraphs = text.split('\n\n');
+
+    return paragraphs.map((para, pIdx) => {
+      const lines = para.split('\n');
+      if (lines[0]?.trim().startsWith('-')) {
+        return (
+          <motion.ul
+            key={pIdx}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: pIdx * 0.1 }}
+            className="list-disc pl-4 space-y-1 text-sm mb-2"
+          >
+            {lines.map((line, lIdx) => {
+              const content = line.replace(/^-\s*/, '');
+              return <li key={lIdx} className="mb-1">{renderText(content)}</li>;
+            })}
+          </motion.ul>
+        );
+      }
+
+      return (
+        <motion.p
+          key={pIdx}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: pIdx * 0.1 }}
+          className="text-sm leading-relaxed mb-2"
+        >
+          {renderText(para)}
+        </motion.p>
+      );
+    });
+  };
+
+  const renderText = (text: string) => {
+    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, idx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={idx} className="font-bold text-blue-400">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
   };
 
   return (
@@ -301,10 +374,9 @@ function AltoContent({ data }: { data: any }) {
       transition={{ duration: 0.5 }}
       className="prose prose-invert max-w-none"
     >
-      <div
-        className="text-foreground [&>p]:mb-2 [&>ul]:mb-2 [&>strong]:font-bold [&>strong]:text-blue-400"
-        dangerouslySetInnerHTML={{ __html: formatAnalysis(data.analysis) }}
-      />
+      <div className="text-foreground">
+        {renderAnalysis(data.analysis)}
+      </div>
       {data.tokensUsed && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -317,6 +389,32 @@ function AltoContent({ data }: { data: any }) {
           </p>
         </motion.div>
       )}
+    </motion.div>
+  );
+}
+
+function LiveChartContent({ data }: { data: any }) {
+  // Handle both old format (array) and new format (object with data, symbol, exchange)
+  const chartData = Array.isArray(data) ? data : data?.data;
+  const symbol = data?.symbol;
+  const exchange = data?.exchange || 'US';
+
+  if (!Array.isArray(chartData) || chartData.length === 0) {
+    return <p className="text-xs text-muted-foreground">No chart data available</p>;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <LiveChart
+        data={chartData}
+        symbol={symbol}
+        exchange={exchange}
+        initialTimeframe="1d"
+      />
     </motion.div>
   );
 }
