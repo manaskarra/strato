@@ -144,12 +144,21 @@ function LiveChart({ data: initialData, symbol, exchange = 'US', onTimeframeChan
           break;
       }
 
+      console.log(`Fetching chart data: symbol=${symbol}, period=${period}, interval=${interval}`);
+
       // Fetch new data
       const { apiClient } = await import('@/lib/api-client');
       const newData = await apiClient.fetchChartData(symbol, exchange, period, interval);
 
+      console.log(`Received ${Array.isArray(newData) ? newData.length : 'non-array'} data points`);
+
       // Handle both array response and object response
       const dataArray = Array.isArray(newData) ? newData : newData?.data || [];
+
+      if (dataArray.length === 0) {
+        console.warn('No data received for timeframe:', timeframe);
+      }
+
       setChartData(dataArray);
 
       if (onTimeframeChange) {
@@ -157,6 +166,7 @@ function LiveChart({ data: initialData, symbol, exchange = 'US', onTimeframeChan
       }
     } catch (error) {
       console.error('Error fetching chart data:', error);
+      alert(`Failed to fetch ${timeframe} data. Please try again.`);
     } finally {
       setIsLoading(false);
     }

@@ -5,8 +5,11 @@ across 4 finance categories: Stocks, Earnings, Indices, Fed Rates
 import asyncio
 import json
 import httpx
+import logging
 from typing import Any, Dict, List, Optional
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 
 CATEGORY_SLUGS = {
@@ -95,13 +98,18 @@ class PolymarketFinanceService:
                         "ascending": "false",
                     },
                 )
+                logger.info(f"Polymarket API response for {category}: status={response.status_code}")
                 if response.status_code == 200:
                     events = response.json()
+                    logger.info(f"Fetched {len(events)} events for category {category}")
                     parsed = [self._parse_event(e) for e in events]
                     self._set_cache(cache_key, parsed)
                     return parsed
+                else:
+                    logger.warning(f"Polymarket API returned {response.status_code} for {category}: {response.text[:200]}")
                 return []
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error fetching Polymarket category {category}: {str(e)}", exc_info=True)
             return []
 
     async def get_all_categories(self) -> Dict[str, List[Dict[str, Any]]]:

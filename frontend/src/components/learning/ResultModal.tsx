@@ -144,22 +144,26 @@ export function ResultModal({ results, onClose }: ResultModalProps) {
                   className="absolute inset-0 bg-blue-500/20 rounded-xl blur-xl"
                 />
 
-                <div className="relative bg-card border-2 border-blue-500 rounded-xl p-4 shadow-2xl shadow-blue-500/30 max-h-[600px] overflow-y-auto">
-                  <div className="flex items-center gap-3 mb-3 sticky top-0 bg-card z-10 pb-2 border-b border-border">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Sparkles className="w-6 h-6 text-blue-500" />
-                    </motion.div>
-                    <div>
-                      <h2 className="text-xl font-bold text-foreground">
-                        {formatNodeType(altoResult.nodeType)}
-                      </h2>
-                      <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded mt-1" />
+                <div className="relative bg-card border-2 border-blue-500 rounded-xl shadow-2xl shadow-blue-500/30 max-h-[600px] overflow-y-auto">
+                  <div className="sticky top-0 z-20 bg-card/95 backdrop-blur-md border-b border-border px-4 pt-4 pb-3 -mx-4 mx-0">
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Sparkles className="w-6 h-6 text-blue-500" />
+                      </motion.div>
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground">
+                          {formatNodeType(altoResult.nodeType)}
+                        </h2>
+                        <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded mt-1" />
+                      </div>
                     </div>
                   </div>
-                  <ResultContent nodeType={altoResult.nodeType} data={altoResult.data} isAlto={true} />
+                  <div className="p-4">
+                    <ResultContent nodeType={altoResult.nodeType} data={altoResult.data} isAlto={true} />
+                  </div>
                 </div>
               </motion.div>
             )}

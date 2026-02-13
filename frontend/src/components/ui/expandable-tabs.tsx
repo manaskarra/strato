@@ -83,6 +83,7 @@ export function ExpandableTabs({
 
         const Icon = tab.icon;
         const isHovered = hoveredIndex === index;
+        const isSelected = selected === index;
 
         return (
           <motion.button
@@ -90,7 +91,7 @@ export function ExpandableTabs({
             variants={buttonVariants}
             initial={false}
             animate="animate"
-            custom={isHovered}
+            custom={isHovered || isSelected}
             onClick={() => handleSelect(index)}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
@@ -104,7 +105,7 @@ export function ExpandableTabs({
           >
             <Icon size={18} />
             <AnimatePresence initial={false}>
-              {isHovered && (
+              {(isHovered || selected === index) && (
                 <motion.span
                   variants={spanVariants}
                   initial="initial"

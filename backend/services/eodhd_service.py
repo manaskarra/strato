@@ -149,7 +149,20 @@ class EODHDService:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(url)
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+
+            # Convert to consistent format (normalize field names)
+            return [
+                {
+                    "datetime": item.get("timestamp", item.get("datetime")),
+                    "open": item["open"],
+                    "high": item["high"],
+                    "low": item["low"],
+                    "close": item["close"],
+                    "volume": item.get("volume", 0)
+                }
+                for item in data
+            ]
 
     async def fetch_historical_data(self, symbol: str, exchange: str = "US", period: str = "year"):
         """Fetch historical EOD data"""

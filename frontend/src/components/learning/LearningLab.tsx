@@ -20,7 +20,7 @@ import { TutorialContent } from '@/lib/types';
 import { executeWorkflow, NodeResult } from '@/lib/workflow-executor';
 import { Input } from '@/components/ui/input';
 import {
-  GraduationCap, Save, Trash2, Sparkles,
+  GraduationCap, Trash2,
   BarChart3, TrendingUp, DollarSign, Newspaper, Activity,
   GitCompare, Hash, CandlestickChart, Play, Smile, Link,
 } from 'lucide-react';
@@ -457,7 +457,10 @@ function LearningLabInner() {
             <GraduationCap className="w-4 h-4 text-blue-500" />
             Learning Lab
           </h2>
-          <p className="text-[10px] text-muted-foreground mt-1">Add analysis nodes between Stock Symbol → Ask Alto</p>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Add analysis nodes between<br />
+            Stock Symbol → Ask Alto
+          </p>
         </div>
 
         <div className="px-3 py-1.5 bg-muted/30 border-b border-border">
@@ -530,22 +533,9 @@ function LearningLabInner() {
           >
             <Play className="w-3.5 h-3.5" /> {isExecuting ? 'Running...' : 'Run Workflow'}
           </Button>
-          <Button
-            size="sm"
-            className="w-full gap-1.5 text-xs bg-blue-600 hover:bg-blue-700"
-            onClick={handleLearn}
-            disabled={nodes.length < 2 || tutorialLoading}
-          >
-            <Sparkles className="w-3.5 h-3.5" /> {tutorialLoading ? 'Generating...' : 'Learn'}
+          <Button variant="outline" size="sm" className="w-full gap-1 text-[10px] px-2" onClick={() => { setNodes(defaultNodes); setEdges([]); }}>
+            <Trash2 className="w-3 h-3" /> Clear
           </Button>
-          <div className="flex gap-1.5">
-            <Button variant="outline" size="sm" className="flex-1 gap-1 text-[10px] px-2" onClick={() => setSavedWorkflows([...savedWorkflows, { name: `Workflow ${savedWorkflows.length + 1}`, nodes, edges }])} disabled={nodes.length === 0}>
-              <Save className="w-3 h-3" /> Save
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1 text-[10px] px-2" onClick={() => { setNodes(defaultNodes); setEdges([]); }}>
-              <Trash2 className="w-3 h-3" />
-            </Button>
-          </div>
         </div>
       </div>
 

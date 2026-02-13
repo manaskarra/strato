@@ -94,14 +94,6 @@ export const apiClient = {
     return response.json();
   },
 
-  /**
-   * Fetch earnings markets with Alto's predictions and edge analysis
-   */
-  async fetchEarningsWithEdge() {
-    const response = await fetch(`${PYTHON_BACKEND_URL}/api/polymarket/earnings-with-edge`);
-    if (!response.ok) throw new Error('Failed to fetch earnings with edge analysis');
-    return response.json();
-  },
 
   /**
    * Alto AI analysis
