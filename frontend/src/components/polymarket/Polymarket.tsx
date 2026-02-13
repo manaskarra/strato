@@ -9,45 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { SkeletonCard, SkeletonRow } from '@/components/shared/SkeletonCard';
 import {
-  BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip as RechartsTooltip, ResponsiveContainer,
-} from 'recharts';
-import {
-  LayoutDashboard, Store, Fish, Signal,
-  Search, ArrowUpRight, ArrowDownRight, Trophy,
+  Store, Fish, Signal,
+  Search, ArrowUpRight, ArrowDownRight,
   AlertTriangle, Users,
   RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // ── Mock Data ──────────────────────────────────────────────
-
-const mockDashboardStats = {
-  activeMarkets: 847,
-  activeSignals: 23,
-  trackedWhales: 156,
-  winRate: 68.4,
-};
-
-const mockVolumeData = [
-  { hour: '00:00', volume: 1200000 },
-  { hour: '04:00', volume: 850000 },
-  { hour: '08:00', volume: 2100000 },
-  { hour: '12:00', volume: 3400000 },
-  { hour: '16:00', volume: 2800000 },
-  { hour: '20:00', volume: 1900000 },
-  { hour: '24:00', volume: 1500000 },
-];
-
-const mockScoreData = [
-  { date: 'Mon', score: 72 },
-  { date: 'Tue', score: 68 },
-  { date: 'Wed', score: 81 },
-  { date: 'Thu', score: 75 },
-  { date: 'Fri', score: 89 },
-  { date: 'Sat', score: 84 },
-  { date: 'Sun', score: 77 },
-];
 
 const mockSignals = [
   { id: 1, market: 'Will Bitcoin reach $100K by March 2026?', direction: 'BUY' as const, entry: 0.42, current: 0.51, tp: 0.65, sl: 0.30, pnl: 21.4, confidence: 82, status: 'active' as const },
@@ -75,118 +44,6 @@ const mockWhales = [
   { wallet: '0x3m4n...5o6p', volume: 1200000, positions: 8, winRate: 87.5, pnl: 98000, alerts: [{ type: 'New Position' as const, market: 'Ethereum $5K', amount: 120000, time: '1h ago' }] },
   { wallet: '0x7q8r...9s0t', volume: 950000, positions: 15, winRate: 53.3, pnl: -18000, alerts: [{ type: 'Size Decrease' as const, market: 'OpenAI IPO', amount: 25000, time: '8h ago' }] },
 ];
-
-// ── Dashboard Tab ──────────────────────────────────────────
-
-function DashboardTab() {
-  const [loading, setLoading] = useState(true);
-  useEffect(() => { const t = setTimeout(() => setLoading(false), 600); return () => clearTimeout(t); }, []);
-
-  if (loading) return <div className="space-y-4"><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <SkeletonCard key={i} lines={1} />)}</div><div className="grid grid-cols-1 lg:grid-cols-2 gap-4"><SkeletonCard lines={5} /><SkeletonCard lines={5} /></div></div>;
-
-  const stats = [
-    { label: 'Active Markets', value: mockDashboardStats.activeMarkets.toLocaleString(), icon: Store, color: 'text-blue-500' },
-    { label: 'Active Signals', value: mockDashboardStats.activeSignals, icon: Signal, color: 'text-emerald-500' },
-    { label: 'Tracked Whales', value: mockDashboardStats.trackedWhales, icon: Fish, color: 'text-purple-500' },
-    { label: 'Win Rate', value: `${mockDashboardStats.winRate}%`, icon: Trophy, color: 'text-yellow-500' },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
-                <stat.icon className={cn('w-4 h-4', stat.color)} />
-              </div>
-              <p className="text-xl font-bold text-foreground mt-2">{stat.value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base text-foreground">Market Volume (24h)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={mockVolumeData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="hour" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
-                <YAxis tick={{ fontSize: 11 }} className="fill-muted-foreground" tickFormatter={(v) => `$${(v / 1_000_000).toFixed(1)}M`} />
-                <RechartsTooltip
-                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Volume']}
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, color: 'hsl(var(--foreground))' }}
-                />
-                <Bar dataKey="volume" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base text-foreground">Composite Scores (7d)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={mockScoreData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
-                <YAxis tick={{ fontSize: 11 }} className="fill-muted-foreground" />
-                <RechartsTooltip
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, color: 'hsl(var(--foreground))' }}
-                />
-                <defs>
-                  <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <Area type="monotone" dataKey="score" stroke="#8b5cf6" fill="url(#scoreGradient)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base text-foreground flex items-center gap-2">
-            <Signal className="w-4 h-4 text-emerald-500" /> Recent Active Signals
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {mockSignals.filter(s => s.status === 'active').slice(0, 3).map((signal) => (
-              <div key={signal.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/30">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <Badge className={cn('shrink-0 border-0', signal.direction === 'BUY' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500')}>
-                    {signal.direction}
-                  </Badge>
-                  <p className="text-sm text-foreground truncate">{signal.market}</p>
-                </div>
-                <div className="flex items-center gap-4 shrink-0">
-                  <div className="text-right">
-                    <p className="text-[10px] text-muted-foreground">Entry / Current</p>
-                    <p className="text-xs font-medium text-foreground">${signal.entry.toFixed(2)} / ${signal.current.toFixed(2)}</p>
-                  </div>
-                  <p className={cn('text-sm font-bold', signal.pnl >= 0 ? 'text-emerald-500' : 'text-red-500')}>
-                    {signal.pnl >= 0 ? '+' : ''}{signal.pnl.toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 // ── Markets Tab ────────────────────────────────────────────
 
@@ -448,17 +305,15 @@ export function Polymarket() {
         </Button>
       </div>
 
-      <Tabs defaultValue="dashboard" className="space-y-6">
+      <Tabs defaultValue="signals" className="space-y-6">
         <TabsList className="bg-muted p-1">
-          <TabsTrigger value="dashboard" className="gap-2"><LayoutDashboard className="w-4 h-4" /> Dashboard</TabsTrigger>
+          <TabsTrigger value="signals" className="gap-2"><Signal className="w-4 h-4" /> Signals</TabsTrigger>
           <TabsTrigger value="markets" className="gap-2"><Store className="w-4 h-4" /> Markets</TabsTrigger>
           <TabsTrigger value="whales" className="gap-2"><Fish className="w-4 h-4" /> Whales</TabsTrigger>
-          <TabsTrigger value="signals" className="gap-2"><Signal className="w-4 h-4" /> Signals</TabsTrigger>
         </TabsList>
-        <TabsContent value="dashboard"><DashboardTab key={`dash-${refreshKey}`} /></TabsContent>
+        <TabsContent value="signals"><SignalsTab key={`signals-${refreshKey}`} /></TabsContent>
         <TabsContent value="markets"><MarketsTab key={`markets-${refreshKey}`} /></TabsContent>
         <TabsContent value="whales"><WhalesTab key={`whales-${refreshKey}`} /></TabsContent>
-        <TabsContent value="signals"><SignalsTab key={`signals-${refreshKey}`} /></TabsContent>
       </Tabs>
     </div>
   );

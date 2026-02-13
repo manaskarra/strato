@@ -25,6 +25,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Strato — Above the Market Noise",
   description: "Financial intelligence platform powered by AI. Daily market briefs, portfolio analysis, and interactive learning.",
+  other: {
+    'google': 'notranslate',
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +36,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" translate="no" suppressHydrationWarning>
+      <head>
+        <meta name="google" content="notranslate" />
+      </head>
       <body className={`${playfair.variable} ${dmSans.variable} ${jetbrainsMono.variable} font-[family-name:var(--font-sans)] antialiased`}>
         <Providers>
           <AppLayout>

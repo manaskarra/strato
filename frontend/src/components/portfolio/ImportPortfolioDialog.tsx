@@ -267,7 +267,7 @@ export function ImportPortfolioDialog({ onImport }: ImportPortfolioDialogProps) 
           <Upload className="w-3.5 h-3.5" /> Import CSV
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[95vw] w-[1400px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl w-full max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Import Portfolio from CSV</DialogTitle>
           <DialogDescription>
@@ -277,7 +277,7 @@ export function ImportPortfolioDialog({ onImport }: ImportPortfolioDialogProps) 
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-y-auto flex-1">
           {/* Step 1: File Upload */}
           {step === 'upload' && (
             <>
@@ -420,7 +420,7 @@ export function ImportPortfolioDialog({ onImport }: ImportPortfolioDialogProps) 
                   </div>
                 </div>
 
-                {/* CSV Preview */}
+                {/* CSV Preview - Show all columns with horizontal scroll */}
                 <div>
                   <p className="text-sm font-medium mb-2">Preview (first 5 rows)</p>
                   <div className="border rounded-lg overflow-hidden">

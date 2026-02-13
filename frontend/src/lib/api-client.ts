@@ -57,6 +57,17 @@ export const apiClient = {
   },
 
   /**
+   * Fetch sentiment analysis
+   */
+  async fetchSentiment(symbol: string, exchange: string = 'US') {
+    const response = await fetch(
+      `${PYTHON_BACKEND_URL}/api/eodhd/sentiment?symbol=${symbol}&exchange=${exchange}`
+    );
+    if (!response.ok) throw new Error('Failed to fetch sentiment');
+    return response.json();
+  },
+
+  /**
    * Alto AI analysis
    */
   async analyzeWithAlto(data: {

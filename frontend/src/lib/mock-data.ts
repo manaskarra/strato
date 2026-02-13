@@ -95,9 +95,9 @@ export const workflowTemplates: WorkflowTemplate[] = [
     difficulty: 'beginner',
     category: 'AI Analysis',
     nodes: [
-      { id: '1', type: 'custom', position: { x: 50, y: 120 }, data: { label: 'News Search', nodeType: 'news-search', color: '#ec4899' } },
-      { id: '2', type: 'custom', position: { x: 50, y: 280 }, data: { label: 'Stock Selection', nodeType: 'stock-selection', color: '#3b82f6' } },
-      { id: '3', type: 'custom', position: { x: 350, y: 200 }, data: { label: 'Analyst Agent', nodeType: 'analyst-agent', color: '#ec4899' } },
+      { id: '1', type: 'custom', position: { x: 100, y: 100 }, data: { label: 'News Search', nodeType: 'news-search', color: '#ec4899' } },
+      { id: '2', type: 'custom', position: { x: 100, y: 220 }, data: { label: 'Stock Selection', nodeType: 'stock-selection', color: '#3b82f6' } },
+      { id: '3', type: 'custom', position: { x: 320, y: 160 }, data: { label: 'Ask Alto', nodeType: 'alto-analysis', color: '#ec4899' } },
     ],
     edges: [
       { id: 'e1-3', source: '1', target: '3' },
@@ -111,9 +111,9 @@ export const workflowTemplates: WorkflowTemplate[] = [
     difficulty: 'beginner',
     category: 'Technical Analysis',
     nodes: [
-      { id: '1', type: 'custom', position: { x: 50, y: 200 }, data: { label: 'Stock Symbol', nodeType: 'symbol-input', color: '#3b82f6' } },
-      { id: '2', type: 'custom', position: { x: 300, y: 200 }, data: { label: 'Technical Analysis', nodeType: 'technical-analysis', color: '#ec4899' } },
-      { id: '3', type: 'custom', position: { x: 550, y: 200 }, data: { label: 'Live Chart', nodeType: 'live-chart', color: '#ec4899' } },
+      { id: '1', type: 'custom', position: { x: 100, y: 150 }, data: { label: 'Stock Symbol', nodeType: 'symbol-input', color: '#3b82f6' } },
+      { id: '2', type: 'custom', position: { x: 300, y: 150 }, data: { label: 'Technical Analysis', nodeType: 'technical-analysis', color: '#ec4899' } },
+      { id: '3', type: 'custom', position: { x: 500, y: 150 }, data: { label: 'Live Chart', nodeType: 'live-chart', color: '#ec4899' } },
     ],
     edges: [
       { id: 'e1-2', source: '1', target: '2' },
@@ -123,13 +123,13 @@ export const workflowTemplates: WorkflowTemplate[] = [
   {
     id: 'value',
     name: 'Value Investing',
-    description: 'Find undervalued stocks using fundamental analysis and data insights',
+    description: 'Find undervalued stocks using fundamental analysis and AI insights',
     difficulty: 'intermediate',
     category: 'Fundamental Analysis',
     nodes: [
-      { id: '1', type: 'custom', position: { x: 50, y: 200 }, data: { label: 'Stock Selection', nodeType: 'stock-selection', color: '#3b82f6' } },
-      { id: '2', type: 'custom', position: { x: 300, y: 200 }, data: { label: 'Fundamental Analysis', nodeType: 'fundamental-analysis', color: '#ec4899' } },
-      { id: '3', type: 'custom', position: { x: 550, y: 200 }, data: { label: 'Data Insights', nodeType: 'data-insights', color: '#ec4899' } },
+      { id: '1', type: 'custom', position: { x: 100, y: 150 }, data: { label: 'Stock Selection', nodeType: 'stock-selection', color: '#3b82f6' } },
+      { id: '2', type: 'custom', position: { x: 300, y: 150 }, data: { label: 'Fundamental Analysis', nodeType: 'fundamental-analysis', color: '#ec4899' } },
+      { id: '3', type: 'custom', position: { x: 520, y: 150 }, data: { label: 'Ask Alto', nodeType: 'alto-analysis', color: '#ec4899' } },
     ],
     edges: [
       { id: 'e1-2', source: '1', target: '2' },
@@ -143,11 +143,11 @@ export const workflowTemplates: WorkflowTemplate[] = [
     difficulty: 'advanced',
     category: 'Complete Strategy',
     nodes: [
-      { id: '1', type: 'custom', position: { x: 50, y: 100 }, data: { label: 'News Search', nodeType: 'news-search', color: '#ec4899' } },
-      { id: '2', type: 'custom', position: { x: 50, y: 300 }, data: { label: 'Stock Selection', nodeType: 'stock-selection', color: '#3b82f6' } },
-      { id: '3', type: 'custom', position: { x: 300, y: 100 }, data: { label: 'Technical Analysis', nodeType: 'technical-analysis', color: '#ec4899' } },
-      { id: '4', type: 'custom', position: { x: 300, y: 300 }, data: { label: 'Fundamental Analysis', nodeType: 'fundamental-analysis', color: '#ec4899' } },
-      { id: '5', type: 'custom', position: { x: 550, y: 200 }, data: { label: 'Analyst Agent', nodeType: 'analyst-agent', color: '#ec4899' } },
+      { id: '1', type: 'custom', position: { x: 100, y: 80 }, data: { label: 'News Search', nodeType: 'news-search', color: '#ec4899' } },
+      { id: '2', type: 'custom', position: { x: 100, y: 240 }, data: { label: 'Stock Selection', nodeType: 'stock-selection', color: '#3b82f6' } },
+      { id: '3', type: 'custom', position: { x: 300, y: 80 }, data: { label: 'Technical Analysis', nodeType: 'technical-analysis', color: '#ec4899' } },
+      { id: '4', type: 'custom', position: { x: 300, y: 240 }, data: { label: 'Fundamental Analysis', nodeType: 'fundamental-analysis', color: '#ec4899' } },
+      { id: '5', type: 'custom', position: { x: 520, y: 160 }, data: { label: 'Ask Alto', nodeType: 'alto-analysis', color: '#ec4899' } },
     ],
     edges: [
       { id: 'e1-3', source: '1', target: '3' },

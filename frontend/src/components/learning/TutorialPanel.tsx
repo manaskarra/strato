@@ -32,7 +32,7 @@ export function TutorialPanel({ tutorial, loading, onClose }: TutorialPanelProps
   const resetQuiz = () => { setCurrentQuestion(0); setSelectedAnswer(null); setAnswers({}); setShowResult(false); };
 
   return (
-    <div className="w-[380px] border-l border-border bg-card flex flex-col shrink-0">
+    <div className="w-[320px] border-l border-border bg-card flex flex-col shrink-0 h-full overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-blue-500" />

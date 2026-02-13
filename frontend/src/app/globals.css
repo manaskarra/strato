@@ -119,6 +119,10 @@
 .react-flow__minimap a {
   display: none !important;
 }
+/* Hide ReactFlow attribution watermark */
+.react-flow__attribution {
+  display: none !important;
+}
 
 /* Skeleton pulse animation */
 @keyframes shimmer {
